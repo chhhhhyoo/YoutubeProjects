@@ -2,8 +2,7 @@ from VidList import channel_videos
 from VidItem import video_spec
 from dotenv import load_dotenv
 import os
-
-# Load environment variables from .env file
+import pandas as pd
 
 
 def configure():
@@ -31,9 +30,10 @@ if __name__ == '__main__':
         comments = video_spec.get_video_comments(video_id, api_key)
         all_comments.extend(comments)
 
-    # Process comments further (e.g., NLP tasks)
-    for comment in all_comments:
-        print(f"Video ID: {comment['videoId']}")
-        print(f"Author: {comment['author']}")
-        print(f"Comment: {comment['text']}")
-        print("\n")
+    # Convert to DataFrame and save to CSV
+    df = pd.DataFrame(all_comments)
+    print(df.shape)
+    print(df.head())
+    df['date'] = pd.to_datetime(df['publishedAt'], errors='coerce')
+    df['just_date'] = df['date'].dt.date
+    df.to_csv('./tinas_comments.csv', index=False)
