@@ -12,7 +12,7 @@ def get_channel_videos(channel_id, api_key):
         request = youtube.search().list(
             part='snippet',
             channelId=channel_id,
-            maxResults=50,
+            maxResults=3,
             pageToken=next_page_token
         )
         try:

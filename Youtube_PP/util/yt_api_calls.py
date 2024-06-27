@@ -2,7 +2,7 @@ import time
 from googleapiclient.errors import HttpError
 
 
-def execute_with_retries(api_request, max_retries=5, wait_time=10):
+def execute_with_retries(api_request, max_retries=5, wait_time=3):
     retries = 0
     while retries < max_retries:
         try:
