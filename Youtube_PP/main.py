@@ -1,17 +1,25 @@
-from List import channel_videos
-from Item import video_spec
+from VidList import channel_videos
+from VidItem import video_spec
 from dotenv import load_dotenv
 import os
 
 # Load environment variables from .env file
-load_dotenv()
+
+
+def configure():
+    load_dotenv('.env')
+
 
 if __name__ == '__main__':
+    configure()
     api_key = os.getenv('API_KEY')
     if not api_key:
         raise ValueError("API_KEY not found in environment variables.")
 
     channel_id = os.getenv('CHANNEL_ID')
+    if not channel_id:
+        raise ValueError("CHANNEL_ID not found in environment variables.")
+
     videos = channel_videos.get_channel_videos(channel_id, api_key)
 
     all_comments = []
