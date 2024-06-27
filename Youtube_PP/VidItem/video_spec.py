@@ -1,5 +1,5 @@
-import youtube_api_auth as youtube_api_auth
-import time
+import youtube_api_auth
+from util.yt_api_calls import execute_with_retries
 
 
 def get_video_comments(video_id, api_key):
@@ -8,15 +8,15 @@ def get_video_comments(video_id, api_key):
     next_page_token = None
 
     while True:
-        try:
-            request = youtube.commentThreads().list(
-                part='snippet',
-                videoId=video_id,
-                maxResults=3,  # Max comments to collect
-                pageToken=next_page_token
-            )
-            response = request.execute()
+        request = youtube.commentThreads().list(
+            part='snippet',
+            videoId=video_id,
+            maxResults=100,  # Adjust as needed
+            pageToken=next_page_token
+        )
+        response = execute_with_retries(request, wait_time=30)
 
+        if response:
             for item in response['items']:
                 comment = item['snippet']['topLevelComment']['snippet']
                 comments.append({
@@ -30,10 +30,7 @@ def get_video_comments(video_id, api_key):
 
             if not next_page_token:
                 break
-
-        except Exception as e:
-            print(f"An error occurred: {e}")
-            print("Retrying after 3 seconds...")
-            time.sleep(3)  # Retry after 3 seconds
+        else:
+            break
 
     return comments

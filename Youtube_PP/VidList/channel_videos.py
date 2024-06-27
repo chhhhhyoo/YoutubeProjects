@@ -1,5 +1,6 @@
-import youtube_api_auth as youtube_api_auth
-import time
+import youtube_api_auth
+from googleapiclient.errors import HttpError
+from util.yt_api_calls import execute_with_retries
 
 
 def get_channel_videos(channel_id, api_key):
@@ -8,24 +9,25 @@ def get_channel_videos(channel_id, api_key):
     next_page_token = None
 
     while True:
+        request = youtube.search().list(
+            part='snippet',
+            channelId=channel_id,
+            maxResults=50,
+            pageToken=next_page_token
+        )
         try:
-            request = youtube.search().list(
-                part='snippet',
-                channelId=channel_id,
-                maxResults=3,  # Max videos to collect
-                pageToken=next_page_token
-            )
-            response = request.execute()
+            response = execute_with_retries(request)
+        except HttpError as e:
+            print(f"Failed to fetch videos: {e}")
+            break
 
+        if response:
             videos += response['items']
             next_page_token = response.get('nextPageToken')
 
             if not next_page_token:
                 break
-
-        except Exception as e:
-            print(f"An error occurred: {e}")
-            print("Retrying after 3 seconds...")
-            time.sleep(3)  # Retry after 3 seconds
+        else:
+            break
 
     return videos
