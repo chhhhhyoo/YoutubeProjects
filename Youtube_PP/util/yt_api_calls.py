@@ -9,7 +9,7 @@ def execute_with_retries(api_request, max_retries=5, wait_time=3):
             response = api_request.execute()
             return response
         except HttpError as e:
-            error_message = e._get_reason()
+            error_message = str(e.content)
             if 'quotaExceeded' in error_message:
                 print("Quota exceeded. Exiting...")
                 raise e
